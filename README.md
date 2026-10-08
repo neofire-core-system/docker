@@ -19,7 +19,7 @@ Beim ersten Start wartet der Container auf die Datenbank und richtet den Shop au
 
 neofire Core läuft im mittwald mStudio als Container-Stack (neofire Core + MariaDB). Eingerichtet wird es per Knopfdruck über GitHub Actions.
 
-1. **Projekt im mStudio anlegen** (oder ein bestehendes nehmen) und unter *Container* die ID des Standard-Stacks kopieren.
+1. **Projekt im mStudio anlegen** (Tarif mit Container-Hosting) und darin unter *Container* einen **Stack anlegen** (z. B. „neofire“). Dessen ID kopieren.
 2. **API-Token erstellen:** mStudio › Profil › API-Tokens › neues Token mit Schreibrechten.
 3. **Dieses Repository forken** (oben rechts *Fork*).
 4. Im Fork unter *Settings › Secrets and variables › Actions* eintragen:
