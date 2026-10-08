@@ -1,0 +1,45 @@
+# neofire Core im mittwald mStudio (Container-Stack)
+# Wird von .github/workflows/deploy-mittwald.yml über mittwald/deploy-container-action eingespielt.
+# Werte in {{ .Env.… }} kommen aus den Eingaben und Secrets des Workflows – nichts Geheimes steht im Repository.
+services:
+  neofire:
+    image: ghcr.io/neofire-core-system/core:1
+    description: neofire Core
+    ports:
+      - "80/tcp"
+    environment:
+      TZ: Europe/Berlin
+      DB_HOST: mariadb
+      DB_NAME: neofire
+      DB_USER: neofire
+      DB_PASS: "{{ .Env.NEOFIRE_DB_PASSWORD }}"
+      SHOP_URL: "{{ .Env.SHOP_URL }}"
+      SHOP_NAME: "{{ .Env.SHOP_NAME }}"
+      SHOP_EMAIL: "{{ .Env.SHOP_EMAIL }}"
+      ADMIN_USER: "{{ .Env.ADMIN_USER }}"
+      ADMIN_EMAIL: "{{ .Env.ADMIN_EMAIL }}"
+      ADMIN_PASS: "{{ .Env.NEOFIRE_ADMIN_PASSWORD }}"
+      COMPANY: "{{ .Env.COMPANY }}"
+      STREET: "{{ .Env.STREET }}"
+      POSTCODE: "{{ .Env.POSTCODE }}"
+      CITY: "{{ .Env.CITY }}"
+      ACCEPT_TERMS: "{{ .Env.ACCEPT_TERMS }}"
+    volumes:
+      - "neofire_data:/var/www/html"
+  mariadb:
+    image: mariadb:lts
+    description: Datenbank für neofire Core
+    ports:
+      - "3306/tcp"
+    environment:
+      TZ: Europe/Berlin
+      MARIADB_AUTO_UPGRADE: "1"
+      MARIADB_DATABASE: neofire
+      MARIADB_USER: neofire
+      MARIADB_PASSWORD: "{{ .Env.NEOFIRE_DB_PASSWORD }}"
+      MARIADB_RANDOM_ROOT_PASSWORD: "1"
+    volumes:
+      - "mariadb_data:/var/lib/mysql"
+volumes:
+  neofire_data: {}
+  mariadb_data: {}
