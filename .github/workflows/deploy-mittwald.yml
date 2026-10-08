@@ -1,0 +1,104 @@
+name: Installation bei mittwald
+
+# Ein Klick unter „Actions › Installation bei mittwald › Run workflow“ richtet neofire Core
+# im Container-Stack eines mittwald-Projekts ein (bzw. aktualisiert ihn).
+# Vorher einmalig im Repository hinterlegen (Settings › Secrets and variables › Actions):
+#   Secrets:   MITTWALD_API_TOKEN, NEOFIRE_DB_PASSWORD, NEOFIRE_ADMIN_PASSWORD
+#   Variablen: MITTWALD_STACK_ID
+
+on:
+  workflow_dispatch:
+    inputs:
+      shop_url:
+        description: "Adresse des Shops (z. B. https://shop.example.de)"
+        required: true
+      shop_name:
+        description: "Name des Shops"
+        required: true
+        default: "Mein Shop"
+      shop_email:
+        description: "E-Mail-Adresse des Shops"
+        required: true
+      admin_user:
+        description: "Benutzername für die Verwaltung"
+        required: true
+        default: "admin"
+      admin_email:
+        description: "E-Mail-Adresse für die Verwaltung"
+        required: false
+      company:
+        description: "Firma (Impressum, Belege)"
+        required: true
+      street:
+        description: "Straße und Hausnummer"
+        required: true
+      postcode:
+        description: "PLZ"
+        required: true
+      city:
+        description: "Ort"
+        required: true
+      accept_terms:
+        description: "Ich akzeptiere die Lizenzbedingungen, AGB und Datenschutzerklärung von neofire"
+        type: boolean
+        required: true
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Bedingungen prüfen
+        if: ${{ !inputs.accept_terms }}
+        run: |
+          echo "Bitte die Lizenzbedingungen, AGB und Datenschutzerklärung von neofire akzeptieren (Haken setzen)." >&2
+          exit 1
+
+      - name: Zugangsdaten prüfen
+        env:
+          MITTWALD_API_TOKEN: ${{ secrets.MITTWALD_API_TOKEN }}
+          NEOFIRE_DB_PASSWORD: ${{ secrets.NEOFIRE_DB_PASSWORD }}
+          NEOFIRE_ADMIN_PASSWORD: ${{ secrets.NEOFIRE_ADMIN_PASSWORD }}
+          MITTWALD_STACK_ID: ${{ vars.MITTWALD_STACK_ID }}
+        run: |
+          missing=""
+          [ -n "$MITTWALD_API_TOKEN" ] || missing="$missing MITTWALD_API_TOKEN"
+          [ -n "$NEOFIRE_DB_PASSWORD" ] || missing="$missing NEOFIRE_DB_PASSWORD"
+          [ -n "$NEOFIRE_ADMIN_PASSWORD" ] || missing="$missing NEOFIRE_ADMIN_PASSWORD"
+          [ -n "$MITTWALD_STACK_ID" ] || missing="$missing MITTWALD_STACK_ID"
+          if [ -n "$missing" ]; then
+            echo "Fehlt im Repository (Settings › Secrets and variables › Actions):$missing" >&2
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+
+      - name: neofire Core bei mittwald einspielen
+        uses: mittwald/deploy-container-action@v1
+        env:
+          NEOFIRE_DB_PASSWORD: ${{ secrets.NEOFIRE_DB_PASSWORD }}
+          NEOFIRE_ADMIN_PASSWORD: ${{ secrets.NEOFIRE_ADMIN_PASSWORD }}
+          SHOP_URL: ${{ inputs.shop_url }}
+          SHOP_NAME: ${{ inputs.shop_name }}
+          SHOP_EMAIL: ${{ inputs.shop_email }}
+          ADMIN_USER: ${{ inputs.admin_user }}
+          ADMIN_EMAIL: ${{ inputs.admin_email }}
+          COMPANY: ${{ inputs.company }}
+          STREET: ${{ inputs.street }}
+          POSTCODE: ${{ inputs.postcode }}
+          CITY: ${{ inputs.city }}
+          ACCEPT_TERMS: "1"
+        with:
+          api_token: ${{ secrets.MITTWALD_API_TOKEN }}
+          stack_id: ${{ vars.MITTWALD_STACK_ID }}
+          stack_file: ${{ github.workspace }}/mittwald/stack.yaml
+          skip_recreation: "mariadb"
+
+      - name: Nächster Schritt
+        run: |
+          echo "neofire Core wird im Stack eingerichtet (beim ersten Start ca. 1–2 Minuten)."
+          echo "Im mStudio unter Domains die Adresse ${{ inputs.shop_url }} auf den Container „neofire“, Port 80, zeigen lassen."
+          echo "Danach: ${{ inputs.shop_url }}/admin"

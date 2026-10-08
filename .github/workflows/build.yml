@@ -13,7 +13,7 @@ permissions:
 
 env:
   IMAGE: ghcr.io/${{ github.repository_owner }}/core
-  NEOFIRE_ZIP_URL: https://www.neofire.de/downloads/neofire-core-1.0.0.0.zip
+  NEOFIRE_MANIFEST: https://www.neofire.de/downloads/neofire-core.json
 
 jobs:
   build:
@@ -24,7 +24,11 @@ jobs:
       - name: Read package version
         id: pkg
         run: |
-          curl -fsSL "$NEOFIRE_ZIP_URL?build=$(date +%s)" -o neofire.zip
+          # Aktuelle Fassung aus dem Manifest (zip = volle Adresse oder Dateiname neben dem Manifest)
+          zip=$(curl -fsSL "$NEOFIRE_MANIFEST?build=$(date +%s)" | python3 -c 'import json,sys; print(json.load(sys.stdin)["zip"])')
+          case "$zip" in http*) ;; *) zip="https://www.neofire.de/downloads/$zip" ;; esac
+          echo "NEOFIRE_ZIP_URL=$zip" >> "$GITHUB_ENV"
+          curl -fsSL "$zip?build=$(date +%s)" -o neofire.zip
           version=$(unzip -p neofire.zip VERSION | tr -d '[:space:]')
           checksum=$(sha1sum neofire.zip | cut -c1-12)
           major=${version%%.*}
