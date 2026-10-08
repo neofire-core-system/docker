@@ -37,7 +37,7 @@ Die Vorlage liegt in [`mittwald/stack.yaml`](mittwald/stack.yaml), der Ablauf in
 Im leeren Web-Verzeichnis per SSH:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/neofire-core-system/neofire-core-system/main/install.sh -o /tmp/neofire-install.sh
+curl -fsSL https://raw.githubusercontent.com/neofire-core-system/docker/main/install.sh -o /tmp/neofire-install.sh
 bash /tmp/neofire-install.sh
 ```
 
