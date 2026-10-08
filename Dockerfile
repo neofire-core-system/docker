@@ -1,6 +1,6 @@
 FROM php:8.3-apache-bookworm
 
-ARG NEOFIRE_ZIP_URL=https://www.neofire.de/downloads/neofire-core-1.0.0.0.zip
+ARG NEOFIRE_ZIP_URL=https://www.neofire.de/downloads/neofire-core-1.0.0.1.zip
 ARG NEOFIRE_BUILD=local
 
 RUN set -eux; \

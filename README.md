@@ -15,6 +15,23 @@ docker compose up -d
 
 Beim ersten Start wartet der Container auf die Datenbank und richtet den Shop automatisch ein. Danach ist er unter `SHOP_URL` erreichbar, die Verwaltung unter `SHOP_URL/admin`.
 
+## Installation bei mittwald (mStudio)
+
+neofire Core läuft im mittwald mStudio als Container-Stack (neofire Core + MariaDB). Eingerichtet wird es per Knopfdruck über GitHub Actions.
+
+1. **Projekt im mStudio anlegen** (oder ein bestehendes nehmen) und unter *Container* die ID des Standard-Stacks kopieren.
+2. **API-Token erstellen:** mStudio › Profil › API-Tokens › neues Token mit Schreibrechten.
+3. **Dieses Repository forken** (oben rechts *Fork*).
+4. Im Fork unter *Settings › Secrets and variables › Actions* eintragen:
+   - Secrets: `MITTWALD_API_TOKEN` (das Token), `NEOFIRE_DB_PASSWORD` (frei wählbar, lang), `NEOFIRE_ADMIN_PASSWORD` (Passwort für die Verwaltung)
+   - Variable: `MITTWALD_STACK_ID` (die Stack-ID aus Schritt 1)
+5. **Actions › Installation bei mittwald › Run workflow:** Shop-Adresse, Shopname, E-Mail, Firma und Anschrift eintragen, Bedingungen bestätigen, *Run workflow*.
+6. Im mStudio unter *Domains* die Shop-Adresse auf den Container **neofire**, Port **80**, zeigen lassen.
+
+Nach 1–2 Minuten ist der Shop unter der Adresse erreichbar, die Verwaltung unter `/admin`. Ein erneuter Lauf des Workflows aktualisiert den Kern; die Datenbank wird dabei nicht neu erstellt. Daten liegen in den Stack-Volumes `neofire_data` und `mariadb_data` und sind in der Projektsicherung von mittwald enthalten.
+
+Die Vorlage liegt in [`mittwald/stack.yaml`](mittwald/stack.yaml), der Ablauf in [`.github/workflows/deploy-mittwald.yml`](.github/workflows/deploy-mittwald.yml).
+
 ## Ohne Docker (Webserver mit PHP und MySQL)
 
 Im leeren Web-Verzeichnis per SSH:
