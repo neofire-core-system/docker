@@ -63,4 +63,39 @@ if [ "${NEOFIRE_CRON:-1}" = "1" ]; then
     ) &
 fi
 
+MAIL_INI=/usr/local/etc/php/conf.d/zz-neofire-mail.ini
+if [ -n "${SMTP_HOST:-}" ]; then
+    msmtp_quote() { local v=${1//\\/\\\\}; printf '"%s"' "${v//\"/\\\"}"; }
+    smtp_port=${SMTP_PORT:-587}
+    case "${SMTP_ENCRYPTION:-tls}" in
+        ssl) smtp_tls=on; smtp_starttls=off ;;
+        none|off) smtp_tls=off; smtp_starttls=off ;;
+        *) smtp_tls=on; smtp_starttls=on ;;
+    esac
+    smtp_from=${SMTP_FROM:-${SHOP_EMAIL:-}}
+    {
+        echo "defaults"
+        echo "tls $smtp_tls"
+        echo "tls_starttls $smtp_starttls"
+        echo "tls_trust_file /etc/ssl/certs/ca-certificates.crt"
+        echo "account default"
+        echo "host $SMTP_HOST"
+        echo "port $smtp_port"
+        if [ -n "$smtp_from" ]; then echo "from $smtp_from"; fi
+        if [ -n "${SMTP_USER:-}" ]; then
+            echo "auth on"
+            echo "user $SMTP_USER"
+            echo "password $(msmtp_quote "${SMTP_PASSWORD:-}")"
+        else
+            echo "auth off"
+        fi
+    } > /etc/msmtprc
+    chown www-data:www-data /etc/msmtprc
+    chmod 600 /etc/msmtprc
+    echo 'sendmail_path = "/usr/bin/msmtp -t"' > "$MAIL_INI"
+    log "outgoing mail via $SMTP_HOST:$smtp_port"
+else
+    rm -f "$MAIL_INI"
+fi
+
 exec docker-php-entrypoint "$@"
