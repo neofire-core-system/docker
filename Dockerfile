@@ -6,7 +6,7 @@ ARG NEOFIRE_BUILD=local
 RUN set -eux; \
     apt-get update; \
     apt-get install -y --no-install-recommends \
-        ca-certificates curl unzip rsync mariadb-client \
+        ca-certificates curl unzip rsync mariadb-client msmtp \
         libzip-dev libpng-dev libjpeg62-turbo-dev libfreetype6-dev libwebp-dev \
         libicu-dev libc-client-dev libkrb5-dev; \
     docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp; \

@@ -53,6 +53,10 @@ Das Skript lädt die aktuelle Version von neofire.de, fragt Datenbank, Shop- und
 | `ADMIN_USER`, `ADMIN_EMAIL`, `ADMIN_PASS` | Passwort ja | erster Zugang zur Verwaltung |
 | `COMPANY`, `STREET`, `POSTCODE`, `CITY` | ja | Betreiberangaben (Impressum, Belege) |
 | `ACCEPT_TERMS` | ja | `1` = Lizenzbedingungen, AGB und Datenschutz von neofire akzeptiert |
+| `SMTP_HOST`, `SMTP_PORT` | nein | SMTP-Server für Bestell- und Kontomails, z. B. `mail.agenturserver.de` und `587`; ohne `SMTP_HOST` verschickt der Container keine Mails |
+| `SMTP_ENCRYPTION` | nein | `tls` (STARTTLS, Standard), `ssl` (z. B. Port 465) oder `none` |
+| `SMTP_USER`, `SMTP_PASSWORD` | nein | Zugang zum SMTP-Server (bei mittwald die Delivery-Box) |
+| `SMTP_FROM` | nein | Absenderadresse; ohne Angabe gilt `SHOP_EMAIL` |
 | `NEOFIRE_AUTO_INSTALL` | nein | `0` schaltet die automatische Einrichtung ab |
 | `NEOFIRE_AUTO_UPDATE` | nein | `0` verhindert, dass ein neues Image den Kern (`vendor/neofire`) aktualisiert |
 | `NEOFIRE_CRON` | nein | `0` schaltet die eingebaute Cron-Schleife ab |
